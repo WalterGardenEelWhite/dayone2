@@ -157,6 +157,8 @@
     RUN cp -r /root/smsimulator/smsimulator5.5/work /root/smsimulator/
     WORKDIR /root/smsimulator/work
 
+
+
 # # Install necessary packages and enable EPEL repository for htop
 # #RUN yum update -y && yum install -y epel-release && yum clean all && yum install -y htop
 
