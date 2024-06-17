@@ -1,0 +1,21 @@
+# Load geometry
+/control/execute geometry/geom_dayone_D.mac
+
+# must be called after definition of detector positions
+/samurai/geometry/Update
+
+/action/file/OverWrite y
+/action/file/RunName Sim15Bnn_only1MeV
+/action/file/SaveDirectory root/Sim
+
+/action/gun/Type Tree
+/action/gun/tree/InputFileName root/Gen/15BnnInp_only1MeV.root
+/action/gun/tree/TreeName tree
+
+# do not store the geant4 step information
+/action/data/NEBULA/StoreSteps false
+
+# do not include resolution
+/action/data/NEBULA/Resolution false
+
+/action/gun/tree/beamOn 100000

@@ -1,0 +1,11 @@
+/control/execute geometry/geom_dayone_D.mac
+/samurai/geometry/Update
+/action/file/OverWrite y
+/action/file/RunName Sim17Bnn04_10mrad
+/action/file/SaveDirectory root/Sim/10mrad
+/action/gun/Type Tree
+/action/gun/tree/InputFileName root/Gen/10mrad/17BnnInp04_10mrad.root
+/action/gun/tree/TreeName tree
+/action/data/NEBULA/StoreSteps false
+/action/data/NEBULA/Resolution false
+/action/gun/tree/beamOn 1000000

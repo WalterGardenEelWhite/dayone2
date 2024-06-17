@@ -1,0 +1,236 @@
+// HOW TO USE
+// root [0] .L macros/examples/GenerateInputTree_PhaseSpaceDecay.cc+
+// root [1] GenerateInputTree_PhaseSpaceDecay()
+
+#include "TBeamSimData.hh"
+
+#include "TFile.h"
+#include "TTree.h"
+#include "TChain.h"
+#include "TH1.h"
+#include "TH2.h"
+#include "TGenPhaseSpace.h"
+#include "TRandom3.h"
+#include "TLorentzVector.h"
+#include "TVector3.h"
+
+#include <iostream>
+
+void GenInput_17Bnn(){
+
+  //input tree for tgtxyab & E_in
+  TChain* oritree = new TChain("tree","ALL tree clone");
+  oritree -> Add("$TARTSYS/run/root/All/17BPb.root");
+  oritree -> SetName("oritree");
+
+  Double_t z_beam;
+  Double_t aoz_beam;
+  Double_t beta_beam;
+  Double_t Vb_px;
+  Double_t Vb_py;
+  Double_t Vb_pz;
+
+  Double_t tgtx;
+  Double_t tgty;
+  Double_t tgta;
+  Double_t tgtb;
+  //Int_t    cutB17beam;
+  //Int_t    cuttgt;
+  //Int_t    cutexitwindow;
+
+  oritree -> SetBranchAddress("z_beam",&z_beam);
+  oritree -> SetBranchAddress("aoz_beam",&aoz_beam);
+  oritree -> SetBranchAddress("beta_beam",&beta_beam);
+  oritree -> SetBranchAddress("Vb_px",&Vb_px);
+  oritree -> SetBranchAddress("Vb_py",&Vb_py);
+  oritree -> SetBranchAddress("Vb_pz",&Vb_pz);
+
+  oritree -> SetBranchAddress("tgtx",&tgtx);
+  oritree -> SetBranchAddress("tgty",&tgty);
+  oritree -> SetBranchAddress("tgta",&tgta);
+  oritree -> SetBranchAddress("tgtb",&tgtb);
+  //oritree -> SetBranchAddress("cutB17beam",&cutB17beam);
+  //oritree -> SetBranchAddress("cuttgt",&cuttgt);
+
+  // parameteres
+
+  const Int_t Abeam = 17;
+  const Int_t Afrag = 15;
+  const Int_t Zfrag = 5;
+  const Int_t Ndecay = Abeam - Afrag + 1;
+
+  const Int_t    Z[Ndecay]={Zfrag,0,0};
+  const Int_t    A[Ndecay]={Afrag,1,1};
+
+  const Double_t m_c22 = 20543.416; //[MeV]
+  const Double_t m_c20 = 18667.386; //[MeV]
+
+  const Double_t m_u = 931.4940954;//[MeV/c^2]atomic mass unit  
+  const Double_t m_b19 = 19.*m_u + 59.8;
+  const Double_t m_b17 = 17.*m_u + 43.72;
+  const Double_t m_b15 = 15.*m_u + 28.957;
+  const Double_t m_b14 = 14.*m_u + 23.664;
+  const Double_t m_b13 = 13.*m_u + 16.561;
+
+  const Double_t m_n = 939.565413; //[MeV]
+  const Double_t clight = 299.792458; //[mm/nsec]
+  const Double_t Masses[Ndecay] = {m_b15, m_n, m_n};
+
+  // Init Phase Space Decay
+
+  TFile *file = new TFile("./root/Gen/17BnnInp_eff.root","recreate");
+  TTree *tree = new TTree("tree","Input tree for simtrace");
+  gBeamSimDataArray = new TBeamSimDataArray();
+  tree->Branch("TBeamSimData", gBeamSimDataArray);
+
+  //Set Scat Angle
+  TFile *fileparam = new TFile("./root/Gen/17BnnInpParam_eff.root","Recreate");
+  TTree *treeinp = new TTree("tree","Input tree for simtrace");
+  Double_t nan = TMath::QuietNaN();
+  Double_t scat_ang = nan;
+  Double_t Erel_in = nan; 
+  Double_t Bgen_px = nan; Double_t Bgen_py = nan; Double_t Bgen_pz = nan; Double_t Bgen_E = nan;
+  Double_t Fgen_px = nan; Double_t Fgen_py = nan; Double_t Fgen_pz = nan; Double_t Fgen_E = nan;
+  Double_t N1gen_px = nan; Double_t N1gen_py = nan; Double_t N1gen_pz = nan; Double_t N1gen_E = nan;
+  Double_t N2gen_px = nan; Double_t N2gen_py = nan; Double_t N2gen_pz = nan; Double_t N2gen_E = nan;
+  Double_t Erel_gen = nan;
+  treeinp->Branch("scat_ang", &scat_ang, "scat_ang/D");
+  treeinp->Branch("Erel_in", &Erel_in, "Erel_in/D");
+
+  treeinp->Branch("Bgen_px", &Bgen_px, "Bgen_px/D");
+  treeinp->Branch("Bgen_py", &Bgen_py, "Bgen_py/D");
+  treeinp->Branch("Bgen_pz", &Bgen_pz, "Bgen_pz/D");
+  treeinp->Branch("Bgen_E", &Bgen_E, "Bgen_E/D");
+  treeinp->Branch("Fgen_px", &Fgen_px, "Fgen_px/D");
+  treeinp->Branch("Fgen_py", &Fgen_py, "Fgen_py/D");
+  treeinp->Branch("Fgen_pz", &Fgen_pz, "Fgen_pz/D");
+  treeinp->Branch("Fgen_E", &Fgen_E, "Fgen_E/D");
+  treeinp->Branch("N1gen_px", &N1gen_px, "N1gen_px/D");
+  treeinp->Branch("N1gen_py", &N1gen_py, "N1gen_py/D");
+  treeinp->Branch("N1gen_pz", &N1gen_pz, "N1gen_pz/D");
+  treeinp->Branch("N1gen_E", &N1gen_E, "N1gen_E/D");
+  treeinp->Branch("N2gen_px", &N2gen_px, "N2gen_px/D");
+  treeinp->Branch("N2gen_py", &N2gen_py, "N2gen_py/D");
+  treeinp->Branch("N2gen_pz", &N2gen_pz, "N2gen_pz/D");
+  treeinp->Branch("N2gen_E", &N2gen_E, "N2gen_E/D");
+  treeinp->Branch("Erel_gen", &Erel_gen, "Erel_gen/D");
+ 
+  // for check
+  TH1* herel_gen = new TH1D("herel_gen","Erel generated",200,0,10);
+  TH1* hxypos = new TH2D("hxypos","XY pos (mm)",100,-50,50, 100,-50,50);
+  TH1* hzxpos = new TH2D("hzxpos","ZX pos (mm)",100,-50-3872.23,50-3872.23, 100,-50,50);
+  TH1* hxyang = new TH2D("hxyang","XY ang (mrad)",100,-50,50, 100,-50,50);
+
+  const int neve = oritree->GetEntries();
+ 
+  for (int i=0;i<500000;++i){
+    if(!(i%1000))cout << "\r event "<< i << flush;
+
+    gBeamSimDataArray->clear();
+    oritree -> GetEntry(i);
+
+    ////////////////////////////////////////
+    if(!(aoz_beam>3.387668&&aoz_beam<3.428252&&z_beam>4.4231&&z_beam<5.72888&&tgtx>-35.&&tgtx<35.&&tgty>-35.&&tgty<35.))continue;
+    //if(!(cutB17beam==1&&cuttgt==1))continue;
+    ////////////////////////////////////////
+    Int_t E_high = 10;//Eh%10;
+    //if(E_high==0) E_high = 10;
+
+    Erel_in = gRandom->Uniform(E_high-10,E_high);
+
+    Double_t E_in = m_b17/sqrt(1-beta_beam*beta_beam) - m_b17;
+    Double_t Mbeam = Erel_in;
+
+    for (Int_t i=0;i<Ndecay;++i) Mbeam+=Masses[i];
+
+    Double_t Tbeam = E_in;
+    Double_t Ebeam = Mbeam + Tbeam;
+    Double_t Pbeam_abs = sqrt(Tbeam*(Tbeam+2.0*Mbeam));
+    //cout << Pbeam_abs << " " << Ebeam << endl;
+    
+    TGenPhaseSpace Decay;
+
+    TLorentzVector Pbeam(0, 0, Pbeam_abs, Ebeam);
+
+    // position spread: tgtx, tgty for XY, +-1.5mm for Z
+    Double_t Zpos_target = -3872.23;
+    TVector3 pos_vec(tgtx,
+		     tgty,
+		     gRandom->Uniform(-1.5,1.5)+Zpos_target); 
+
+    //Scattering angle
+    scat_ang = gRandom->Uniform(0,TMath::Pi()*10/180);
+    Double_t phi_ang = gRandom->Uniform(0 , 2*TMath::Pi());
+
+    Pbeam.RotateY(scat_ang);
+    Pbeam.RotateZ(phi_ang);
+  
+    // angular spread xy: tgta, tgtb [rad]
+    Double_t xang = tgta;
+    Double_t yang = tgtb;
+    Pbeam.RotateY(xang);
+    Pbeam.RotateX(-yang);
+
+    //Input for the scattering angle analysis
+    Bgen_px = nan; Bgen_py = nan; Bgen_pz = nan; Bgen_E = nan;
+    TLorentzVector VBeam(0,0,Pbeam_abs,Ebeam);
+    VBeam.RotateY(xang);
+    VBeam.RotateX(-yang);
+    Bgen_px = VBeam.Px(); Bgen_py = VBeam.Py(); Bgen_pz = VBeam.Pz(); Bgen_E = VBeam.E();
+    //////////////////////////////////
+ 
+    //Set phase space decay
+    Decay.SetDecay(Pbeam,Ndecay,Masses);
+
+    //Generate decayed events
+    double weight = Decay.Generate();
+    while (gRandom->Uniform()>weight) weight = Decay.Generate();
+
+    TLorentzVector P[Ndecay];
+    for (int i=0;i<Ndecay;++i){
+      P[i] = *(Decay.GetDecay(i));
+      TBeamSimData particle(Z[i],A[i],P[i],pos_vec);
+      if (Z[i]==0) particle.fParticleName="neutron";
+      particle.fPrimaryParticleID = i;
+      gBeamSimDataArray->push_back(particle);
+
+    }
+    
+    // checking input
+    TLorentzVector Ptot(0,0,0,0);
+    Double_t Mtot=0;
+    for (Int_t i=0;i<Ndecay;i++) {
+      Ptot += P[i];
+      Mtot += P[i].M();
+    }
+
+    //Input for the scattering angle analysis
+    Fgen_px = nan; Fgen_py = nan; Fgen_pz = nan; Fgen_E = nan;
+    N1gen_px = nan; N1gen_py = nan; N1gen_pz = nan; N1gen_E = nan;
+    N2gen_px = nan; N2gen_py = nan; N2gen_pz = nan; N2gen_E = nan;
+    Erel_gen = nan;
+
+    Fgen_px = P[0].Px(); Fgen_py = P[0].Py(); Fgen_pz = P[0].Pz(); Fgen_E = P[0].E();
+    N1gen_px = P[1].Px(); N1gen_py = P[1].Py(); N1gen_pz = P[1].Pz(); N1gen_E = P[1].E();
+    N2gen_px = P[2].Px(); N2gen_py = P[2].Py(); N2gen_pz = P[2].Pz(); N2gen_E = P[2].E();
+
+    TVector3 beam1(Bgen_px,Bgen_py,Bgen_pz);
+    TVector3 beam2(Ptot.Px(),Ptot.Py(),Ptot.Pz());
+    cout << scat_ang << " " << beam1.Angle(beam2) << endl;
+
+    Erel_gen = Ptot.M() - Mtot;
+    herel_gen->Fill(Erel_gen);
+    hxypos->Fill(pos_vec.x(), pos_vec.y());
+    hzxpos->Fill(pos_vec.z(), pos_vec.x());
+    hxyang->Fill(Ptot.Px()/Ptot.Pz()*1000., Ptot.Py()/Ptot.Pz()*1000.);
+
+    // Fill tree
+    tree->Fill();
+    treeinp->Fill();
+
+  }
+  file->Write();
+  file->Close();
+  fileparam->Write();
+  fileparam->Close();
+}
