@@ -8,6 +8,8 @@
 # Quality of life
     RUN echo "alias ll='ls -lah'" >> /root/.bashrc
     RUN echo "alias ..='cd ..'" >> /root/.bashrc
+    RUN echo "alias emn='emacs -nw'" >> /root/.bashrc
+    RUN echo "alias root='root -l'" >> /root/.bashrc
 
 # Dependencies and nice-to-have tools
     RUN yum update -y && yum install -y vim wget emacs tmux libtool automake gcc-c++ gcc
