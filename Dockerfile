@@ -155,7 +155,7 @@
     # DONT USE -j<something> for making simdayone!!! make craps out for some reason, about some .o file in ../tmp
     RUN make
     RUN cp -r /root/smsimulator/smsimulator5.5/work /root/smsimulator/
-    WORKDIR /root/smsimulator/work
+    WORKDIR /root/smsimulator/work/simdayone
 
 
 
